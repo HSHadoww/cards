@@ -191,12 +191,48 @@
 
         </div>
     </div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js'
+        integrity='sha512-zB7yJLSASiSevQmWCrQaq+z/f5zRIa884hwWgmK1oI3MfolIzKcpDtyfBsrGqUi/hMCObVwr/+SZTByOqh0zkQ=='
+        crossorigin='anonymous'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js'
         integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=='
         crossorigin='anonymous'></script>
     <script>
-        // $(document).ready(function () {})
-        // $(function () {})
+        function resetGame() {
+            // 隱藏卡片信息和段落
+            $('.img').css('display', 'none');
+            $('p').css('display', 'none');
+
+            // 關閉所有卡片
+            $('.card').addClass('card-close');
+
+            // 從卡片中刪除 "ok" 類
+            $('.card').removeClass('card-ok');
+            $('#game').empty();
+
+            // 重新生成 20 張卡片
+            for (let i = 0; i < 20; i++) {
+                $('#game').append(`
+                    <div class="card card-close">
+                    <div class="card-front"></div>
+                    <div class="card-back"></div>
+                    </div>
+            `);
+            }
+
+            // 重新決定每張的數字
+            $('.card').each(function (index) {
+                const number = index % 10 + 1;
+                $(this).find('.card-front').css('background-image', `url(./card/${index + 1}.png)`);
+                $(this).attr('data-number', number);
+            });
+            // 洗牌卡片
+            for (let i = 0; i < 50; i++) {
+                const randomA = Math.round(Math.random() * 25);
+                const randomB = Math.round(Math.random() * 25);
+                $('.card').eq(randomA).insertAfter($('.card').eq(randomB));
+            }
+        }
 
         // 產生 20 張卡片
         for (let i = 0; i < 20; i++) {
@@ -260,7 +296,14 @@
                     $('.card:not(.card-close)').addClass('card-close')
                     // 過關判斷
                     if ($('.card-ok').length === $('.card').length) {
-                        alert('過關')
+                        Swal.fire({
+                            icon: 'success',
+                            title: '過關',
+                            text: '恭喜你完成挑戰'
+                        }).then(() => {
+                            // 點擊 "ok" 後重置遊戲
+                            resetGame();
+                        });
                     }
                 }, 1000)
             }
